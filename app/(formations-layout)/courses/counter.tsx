@@ -1,17 +1,15 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { PropsWithChildren, useState } from "react";
+import React, { PropsWithChildren, useState } from "react";
 
-export const Counter = (props: PropsWithChildren) => {
+export default function Counter(props: PropsWithChildren) {
   const [count, setCount] = useState(0);
-  console.log({ count });
-
+  console.log(count);
   return (
-    <div className="border-2 rounded-md">
+    <div>
       <p>{count}</p>
-      <Button onClick={() => setCount(count + 1)}>{count}</Button>
-      {props.children}
+      <Button onClick={() => setCount(count + 1)}>{props.children}</Button>
     </div>
   );
-};
+}

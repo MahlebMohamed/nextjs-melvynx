@@ -1,0 +1,33 @@
+Remarque:
+
+<SelectStar
+                  setNewStar={async (star) => {
+                    "use server";
+                    await setNewStar(review.id, star);
+                  }}
+                  star={review.stars}
+                />
+
+Ici, nous avons une fonction serveur `setNewStar` qui prend deux paramètres : `reviewId` et `star`. Le composant parent possède l'ID de la review (`review.id`), mais le nombre d'étoiles (`star`) est déterminé dans le composant enfant `SelectStar`.
+
+Pour gérer cela, nous avons deux options équivalentes :
+
+1. Utiliser une fonction asynchrone qui :
+   - Est marquée comme fonction serveur avec "use server"
+   - Reçoit uniquement le paramètre `star` du composant enfant
+   - Appelle la fonction serveur principale `setNewStar` en lui passant à la fois l'ID de la review (connu dans le parent) et la nouvelle valeur d'étoiles
+
+2. Utiliser la fonction `bind` pour pré-remplir le premier paramètre (review.id) de la fonction `setNewStar` :
+   ```jsx
+   <SelectStar
+     setNewStar={setNewStar.bind(null, review.id)}
+     star={review.stars}
+   />
+   ```
+
+Les deux approches sont équivalentes et permettent de :
+- Séparer les responsabilités entre composants
+- Maintenir la logique serveur dans le parent
+- Permettre au composant enfant de gérer uniquement l'interaction utilisateur
+- Mettre à jour la base de données via Prisma
+- Revalider le chemin pour rafraîchir les données

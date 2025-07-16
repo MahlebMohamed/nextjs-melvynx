@@ -2,53 +2,43 @@
 
 import { cn } from "@/lib/utils";
 import { Star } from "lucide-react";
-import { useState, useTransition } from "react";
+import { useState } from "react";
 
-/**
- * Client Component
- *
- * Magie de React opère ✨
- * useState / useEffect / onClick / onMouseLeave
- */
-export const SelectStar = (props: {
+export default function SelectStar(props: {
   star: number;
-  onStarChange?: (star: number) => Promise<void>;
-}) => {
-  const [hoverIndex, setHoverIndex] = useState<number | null>(null);
-  const [isPending, startTransition] = useTransition();
+  setStar?: (star: number) => Promise<void>;
+}) {
+  const [hoverIndex, sethoverIndex] = useState<number | null>(null);
+
   return (
     <div
-      className={cn("flex items-center gap-1", {
-        "animate-pulse": isPending,
-      })}
-      onMouseLeave={() => {
-        setHoverIndex(null);
-      }}
+      className="flex items-center gap-1"
+      onMouseLeave={() => sethoverIndex(null)}
     >
       {Array.from({ length: 5 }).map((_, i) => {
-        const isFilled = i < props.star;
-        const isNewFilled = hoverIndex ? i - 1 < hoverIndex : null;
+        const isFilled = props.star > i;
+        const isNewFilled = hoverIndex !== null && i <= hoverIndex;
+
         return (
           <button
-            onMouseEnter={() => {
-              setHoverIndex(i);
-            }}
             key={i}
-            onClick={() => {
-              startTransition(() => {
-                props.onStarChange?.(i + 1);
-              });
+            onMouseEnter={() => {
+              sethoverIndex(i);
             }}
+            onClick={() => props.setStar?.(i + 1)}
           >
             <Star
-              className={cn("text-yellow-400 transition cursor-pointer", {
-                "fill-yellow-400": isFilled,
+              className={cn("w-6 h-6 cursor-pointer text-yellow-500", {
+                "fill-yellow-500": isFilled,
                 "-translate-y-0.5 fill-orange-400 text-orange-400": isNewFilled,
               })}
+              style={{
+                transitionDelay: `${i * 0.05}s`,
+              }}
             />
           </button>
         );
       })}
     </div>
   );
-};
+}

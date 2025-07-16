@@ -1,9 +1,5 @@
 "use client";
 
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
-
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -15,36 +11,38 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { signUp } from "@/lib/auth-client";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
+import { useForm } from "react-hook-form";
 import { toast } from "sonner";
+import { z } from "zod";
 
 const SignUpFormSchema = z.object({
-  name: z.string(),
+  name: z.string().min(2, {
+    message: "Name must be at least 2 characters.",
+  }),
   email: z.string().email(),
   password: z.string(),
 });
 
 export function SignUpForm() {
-  // 1. Define your form.
   const form = useForm<z.infer<typeof SignUpFormSchema>>({
     resolver: zodResolver(SignUpFormSchema),
     defaultValues: {
-      email: "",
       name: "",
+      email: "",
       password: "",
     },
   });
+
   const router = useRouter();
 
-  // 2. Define a submit handler.
   async function onSubmit(values: z.infer<typeof SignUpFormSchema>) {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
     await signUp.email(
       {
         email: values.email,
-        name: values.name,
         password: values.password,
+        name: values.name,
       },
       {
         onSuccess: () => {
@@ -61,7 +59,7 @@ export function SignUpForm() {
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className="flex flex-col gap-6"
+        className="flex flex-col gap-6 w-full"
       >
         <FormField
           control={form.control}
@@ -70,7 +68,7 @@ export function SignUpForm() {
             <FormItem>
               <FormLabel>Name</FormLabel>
               <FormControl>
-                <Input placeholder="" {...field} />
+                <Input placeholder="name" type="text" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -83,7 +81,7 @@ export function SignUpForm() {
             <FormItem>
               <FormLabel>Email</FormLabel>
               <FormControl>
-                <Input type="email" placeholder="" {...field} />
+                <Input placeholder="email" type="email" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -96,12 +94,13 @@ export function SignUpForm() {
             <FormItem>
               <FormLabel>Password</FormLabel>
               <FormControl>
-                <Input type="password" placeholder="" {...field} />
+                <Input placeholder="password" type="password" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
+
         <Button type="submit">Submit</Button>
       </form>
     </Form>

@@ -1,56 +1,39 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 model Review {
-  id     String @id @default(cuid())
+  id     String @id @default(uuid())
   name   String
   review String
-  star   Int
-
-  userId String
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  stars  Int
 
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
 }
 
-// L'utilisateur
 model User {
-  id               String    @id
-  name             String
-  email            String
-  emailVerified    Boolean
-  image            String?
-  createdAt        DateTime
-  updatedAt        DateTime
-  sessions         Session[]
-  accounts         Account[]
-  reviews          Review[]
-  plan             UserPlan  @default(FREE)
-  stripeCustomerId String?
+  id            String    @id
+  name          String
+  email         String
+  emailVerified Boolean
+  image         String?
+  createdAt     DateTime
+  updatedAt     DateTime
+  sessions      Session[]
+  accounts      Account[]
 
   @@unique([email])
   @@map("user")
 }
 
-enum UserPlan {
-  FREE
-  PRO
-}
-
-// Retrouver l'utilisateur quand il refresh la page
 model Session {
   id        String   @id
   expiresAt DateTime
@@ -66,9 +49,6 @@ model Session {
   @@map("session")
 }
 
-// Moyen d'authentification
-// -> Password
-// -> GitHub
 model Account {
   id                    String    @id
   accountId             String
@@ -88,10 +68,6 @@ model Account {
   @@map("account")
 }
 
-// Vérifier des choses
-// Reset password
-// Verify e-mail
-// Magic Link
 model Verification {
   id         String    @id
   identifier String

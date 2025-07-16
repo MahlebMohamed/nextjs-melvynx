@@ -4,48 +4,44 @@ import { cn } from "@/lib/utils";
 import { Check, Edit } from "lucide-react";
 import { useOptimistic, useRef, useState, useTransition } from "react";
 
-export const UpdateTitleForm = (props: {
+export function UpdateTitleForm(props: {
   children: string;
-  onTitleChange?: (newTitle: string) => void;
+  setReviewTitle?: (newTitle: string) => void;
   className?: string;
-}) => {
+}) {
   const [isEditing, setIsEditing] = useState(false);
-  const ref = useRef<HTMLInputElement>(null);
-
-  const [isPending, startTransition] = useTransition();
   const [title, setTitle] = useOptimistic(
     props.children,
     (_, newTitle: string) => newTitle
   );
+  const [isPending, startTransition] = useTransition();
+  const ref = useRef<HTMLInputElement>(null);
 
-  const submit = () => {
-    setIsEditing(false);
-    const newTitle = ref.current?.value ?? "";
-    props.onTitleChange?.(newTitle);
+  function submit() {
+    const newTitle = ref.current?.value || "";
+    props.setReviewTitle?.(newTitle);
     startTransition(() => {
       setTitle(newTitle);
     });
-  };
+    setIsEditing(false);
+  }
 
-  if (isEditing)
+  if (isEditing) {
     return (
       <div className="group flex items-center gap-2">
         <input
-          ref={ref}
           className={cn(props.className)}
           defaultValue={props.children}
-          style={{
-            // @ts-expect-error - new field api
-            fieldSizing: "content",
-          }}
+          ref={ref}
+          style={{ width: "100%", boxSizing: "border-box" }}
           onKeyDown={(event) => {
             if (event.key === "Enter") {
               submit();
             }
           }}
-        ></input>
+        />
         <button
-          className="group-hover:opacity-100 opacity-0 p-1 bg-accent"
+          className="group-hover:opacity-100 opacity-0 cursor-pointer p-1 bg-accent"
           onClick={() => {
             submit();
           }}
@@ -54,18 +50,15 @@ export const UpdateTitleForm = (props: {
         </button>
       </div>
     );
+  }
 
   return (
     <div className="group flex items-center gap-2">
-      <p
-        className={cn(props.className, {
-          "animate-pulse": isPending,
-        })}
-      >
+      <p className={cn(props.className, { "animate-pulse": isPending })}>
         {title}
       </p>
       <button
-        className="group-hover:opacity-100 opacity-0 p-1 bg-accent"
+        className="group-hover:opacity-100 opacity-0 cursor-pointer p-1 bg-accent"
         onClick={() => {
           setIsEditing(true);
           setTimeout(() => {
@@ -77,4 +70,4 @@ export const UpdateTitleForm = (props: {
       </button>
     </div>
   );
-};
+}
